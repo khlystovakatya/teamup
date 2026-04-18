@@ -14,3 +14,4 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
 
     projects = relationship("Project", back_populates="owner")
+    applications = relationship("Application", back_populates="user")
