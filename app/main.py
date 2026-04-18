@@ -44,21 +44,30 @@ def register_page(request: Request):
 @app.post("/register")
 async def register_user(
     request: Request,
-    name: str = Form(...),
+    first_name: str = Form(...),
+    last_name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     user_repository = UserRepository(session)
     user_service = UserService(user_repository)
 
     try:
-        user_data = UserCreate(name=name, email=email, password=password)
+        user_data = UserCreate(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+        )
+
         await user_service.register_user(user_data)
+
         return RedirectResponse(url="/", status_code=303)
+
     except ValueError as e:
         return templates.TemplateResponse(
             request=request,
             name="register.html",
-            context={"error": str(e)}
+            context={"error": str(e)},
         )
