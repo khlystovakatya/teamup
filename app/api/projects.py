@@ -87,3 +87,32 @@ async def create_project(
     await project_service.create_project(project_data, owner_id=user_id)
 
     return RedirectResponse(url="/projects?message=Проект успешно создан", status_code=303)
+
+
+@router.get("/my-projects")
+async def my_projects(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    projects = await project_service.get_all_projects()
+
+    user_projects = [p for p in projects if p.owner_id == user_id]
+
+    user_name = request.session.get("user_name")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="my_projects.html",
+        context={
+            "projects": user_projects,
+            "user_name": user_name,
+        }
+    )

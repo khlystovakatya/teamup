@@ -42,3 +42,19 @@ class ApplicationRepository:
         stmt = select(Application.project_id).where(Application.user_id == user_id)
         result = await self.session.execute(stmt)
         return set(result.scalars().all())
+
+    async def get_by_id(self, application_id: int) -> Application | None:
+        stmt = select(Application).where(Application.id == application_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def update_status(self, application: Application, status: str):
+        application.status = status
+        await self.session.commit()
+        await self.session.refresh(application)
+        return application
+
+    async def get_project_applications(self, project_id: int) -> list[Application]:
+        stmt = select(Application).where(Application.project_id == project_id)
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())

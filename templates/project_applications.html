@@ -1,0 +1,19 @@
+<h1>Отклики на проект</h1>
+
+{% for app in applications %}
+    <div>
+        <p>Пользователь ID: {{ app.user_id }}</p>
+        <p>Статус: {{ app.status }}</p>
+
+        {% if app.status == "pending" %}
+            <form method="post" action="/applications/{{ app.id }}/accept">
+                <button type="submit">Принять</button>
+            </form>
+
+            <form method="post" action="/applications/{{ app.id }}/reject">
+                <button type="submit">Отклонить</button>
+            </form>
+        {% endif %}
+    </div>
+    <hr>
+{% endfor %}

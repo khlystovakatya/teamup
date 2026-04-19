@@ -65,3 +65,67 @@ async def my_applications(
             "user_email": user_email
         }
     )
+
+
+@router.get("/projects/{project_id}/applications")
+async def project_applications(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    application_repository = ApplicationRepository(session)
+    application_service = ApplicationService(application_repository)
+
+    applications = await application_service.get_project_applications(project_id)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="project_applications.html",
+        context={
+            "applications": applications,
+            "project_id": project_id,
+        }
+    )
+
+
+@router.post("/applications/{application_id}/accept")
+async def accept_application(
+    application_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    application_repository = ApplicationRepository(session)
+    application_service = ApplicationService(application_repository)
+
+    try:
+        await application_service.change_status(application_id, user_id, "accepted")
+    except ValueError:
+        pass
+
+    return RedirectResponse(url="/my-projects", status_code=303)
+
+
+@router.post("/applications/{application_id}/reject")
+async def reject_application(
+    application_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    application_repository = ApplicationRepository(session)
+    application_service = ApplicationService(application_repository)
+
+    try:
+        await application_service.change_status(application_id, user_id, "rejected")
+    except ValueError:
+        pass
+
+    return RedirectResponse(url="/my-projects", status_code=303)

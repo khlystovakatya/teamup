@@ -32,3 +32,22 @@ class ApplicationService:
 
     async def get_user_project_ids_with_applications(self, user_id: int) -> set[int]:
         return await self.application_repository.get_user_project_ids_with_applications(user_id)
+
+    async def change_status(self, application_id: int, user_id: int, status: str):
+        application = await self.application_repository.get_by_id(application_id)
+
+        if not application:
+            raise ValueError("Отклик не найден")
+
+        project = await self.application_repository.get_project_by_id(application.project_id)
+
+        if project.owner_id != user_id:
+            raise ValueError("Вы не являетесь владельцем проекта")
+
+        if application.status != "pending":
+            raise ValueError("Статус уже изменен")
+
+        return await self.application_repository.update_status(application, status)
+
+    async def get_project_applications(self, project_id: int):
+        return await self.application_repository.get_project_applications(project_id)
