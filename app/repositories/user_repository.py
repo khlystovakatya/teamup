@@ -18,13 +18,15 @@ class UserRepository:
         first_name: str, 
         last_name: str, 
         email: str, 
-        password: str
+        password: str,
+        role: str,
     ) -> User:
         user = User(
             first_name=first_name, 
             last_name=last_name, 
             email=email, 
-            password=password
+            password=password,
+            role=role,
         )
         self.session.add(user)
         await self.session.commit()

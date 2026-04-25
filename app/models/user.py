@@ -12,6 +12,7 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(String(50), default="user", nullable=False)
 
     projects = relationship("Project", back_populates="owner")
     applications = relationship("Application", back_populates="user")

@@ -11,6 +11,7 @@
     {% if user_name %}
         <p><strong>Вы вошли как:</strong> {{ user_name }}</p>
         <p><strong>Email:</strong> {{ user_email }}</p>
+        <p><strong>Роль:</strong> {{ user_role }}</p>
 
         <a href="/projects">Список проектов</a>
         <br><br>
@@ -23,6 +24,11 @@
 
         <a href="/my-applications">Мои отклики</a>
         <br><br>
+
+        {% if user_role == "admin" %}
+            <a href="/admin/projects">Админ: все проекты</a>
+            <br><br>
+        {% endif %}
 
         <a href="/logout">Выйти</a>
     {% else %}

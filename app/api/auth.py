@@ -25,11 +25,14 @@ async def register_user(
     user_service = UserService(user_repository)
 
     try:
+        role = "admin" if email == "admin@example.com" else "user"
+
         user_data = UserCreate(
             first_name=first_name,
             last_name=last_name,
             email=email,
             password=password,
+            role=role,
         )
 
         await user_service.register_user(user_data)
@@ -65,6 +68,7 @@ async def login_user(
     request.session["user_id"] = user.id
     request.session["user_name"] = f"{user.first_name} {user.last_name}"
     request.session["user_email"] = user.email
+    request.session["user_role"] = user.role
 
     return RedirectResponse(url="/", status_code=303)
 

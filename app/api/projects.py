@@ -116,3 +116,25 @@ async def my_projects(
             "user_name": user_name,
         }
     )
+
+
+@router.get("/admin/projects")
+async def admin_projects(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_role = request.session.get("user_role")
+
+    if user_role != "admin":
+        return RedirectResponse(url="/", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    projects = await project_service.get_all_projects()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_projects.html",
+        context={"projects": projects},
+    )

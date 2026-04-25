@@ -9,6 +9,7 @@ templates = Jinja2Templates(directory="templates")
 def main_page(request: Request):
     user_name = request.session.get("user_name")
     user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
 
     return templates.TemplateResponse(
         request=request,
@@ -16,6 +17,7 @@ def main_page(request: Request):
         context={
             "user_name": user_name,
             "user_email": user_email,
+            "user_role": user_role,
         }
     )
 
