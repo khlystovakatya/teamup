@@ -1,33 +1,42 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Создать проект</title>
-</head>
-<body>
-    <h1>Создание проекта</h1>
+{% extends "base.html" %}
 
+{% block title %}Создание проекта{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Создать проект</h1>
+
+<div class="card create-project-card">
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
     {% endif %}
 
-    <form method="post" action="/projects/create">
-        <div>
-            <label>Название проекта:</label>
-            <input type="text" name="title" required>
+    <form method="post" action="/projects/create" class="form create-project-form">
+        <div class="form-group">
+            <label>Название проекта</label>
+            <input 
+                type="text"
+                name="title"
+                class="form-control"
+                placeholder="Например: Стартап для студентов"
+                required
+            >
         </div>
-        <br>
 
-        <div>
-            <label>Описание проекта:</label>
-            <textarea name="description" rows="6" cols="40" required></textarea>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea 
+                name="description"
+                class="form-control"
+                placeholder="Опиши, что это за проект и кого ты ищешь"
+                required
+            ></textarea>
         </div>
-        <br>
 
-        <button type="submit">Создать проект</button>
+        <button type="submit" class="button">
+            Создать проект
+        </button>
     </form>
-
-    <br>
-    <a href="/projects">К списку проектов</a>
-</body>
-</html>
+</div>
+{% endblock %}
