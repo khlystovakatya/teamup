@@ -1,36 +1,50 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Мои проекты</title>
-</head>
-<body>
-    <h1>Мои проекты</h1>
+{% extends "base.html" %}
 
-    <p><strong>Вы вошли как:</strong> {{ user_name }}</p>
+{% block title %}Мои проекты{% endblock %}
 
-    <br>
-    <a href="/projects">Все проекты</a>
-    <br><br>
-    <a href="/">На главную</a>
+{% block content %}
+<h1 class="page-title">Мои проекты</h1>
 
-    <hr>
-
-    {% if projects %}
+{% if projects %}
+    <div class="project-grid">
         {% for project in projects %}
-            <div style="margin-bottom: 20px;">
+        <div class="card project-card">
+
+            <div>
                 <h3>{{ project.title }}</h3>
                 <p>{{ project.description }}</p>
-                <p><strong>Статус:</strong> {{ project.status }}</p>
+            </div>
 
-                <a href="/projects/{{ project.id }}/applications">
-                    Посмотреть отклики
+            <div class="meta">
+                {% if project.status == "open" %}
+                    <span class="badge badge-success">Открыт</span>
+                {% else %}
+                    <span class="badge badge-muted">Закрыт</span>
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <a href="/projects/{{ project.id }}" class="button button-secondary">
+                    Подробнее
+                </a>
+
+                <a href="/projects/{{ project.id }}/applications" class="button">
+                    Отклики
                 </a>
             </div>
-            <hr>
+
+
+        </div>
         {% endfor %}
-    {% else %}
-        <p>У вас пока нет проектов.</p>
-    {% endif %}
-</body>
-</html>
+    </div>
+{% else %}
+    <div class="card empty">
+        У вас пока нет проектов 😔
+        <br><br>
+        <a href="/projects/create" class="button">
+            Создать проект
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

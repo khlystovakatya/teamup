@@ -280,7 +280,7 @@ textarea.form-control {
 }
 
 .project-card h3 {
-    margin: 0;
+    margin: 0 0 8px;
     font-size: 22px;
 }
 
