@@ -1,32 +1,49 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Мои отклики</title>
-</head>
-<body>
-    <h1>Мои отклики</h1>
+{% extends "base.html" %}
 
-    <p><strong>Вы вошли как:</strong> {{ user_name }}</p>
+{% block title %}Мои отклики{% endblock %}
 
-    <hr>
+{% block content %}
+<h1 class="page-title">Мои отклики</h1>
 
-    {% if applications %}
-        {% for application in applications %}
-            <div style="margin-bottom: 20px;">
-                <p><strong>ID отклика:</strong> {{ application.id }}</p>
-                <p><strong>ID проекта:</strong> {{ application.project_id }}</p>
-                <p><strong>Статус:</strong> {{ application.status }}</p>
-            </div>
-            </hr>
-        {% endfor %}
-    {% else %}
-        <p>У вас пока нет откликов.</p>
-    {% endif %}
+{% if applications %}
+<div class="project-grid">
+    {% for application in applications %}
+    <div class="card project-card">
 
-    <br>    
-    <a href="/projects">К списку проектов</a>
+        <div>
+            <h3>Отклик #{{ application.id }}</h3>
+            <p>Проект ID: {{ application.project_id }}</p>
+        </div>
+
+        <div class="meta">
+            {% if application.status == "pending" %}
+                <span class="badge badge-warning">На рассмотрении</span>
+            {% elif application.status == "accepted" %}
+                <span class="badge badge-success">Принят</span>
+            {% elif application.status == "rejected" %}
+                <span class="badge badge-muted">Отклонен</span>
+            {% else %}
+                <span class="badge badge-muted">{{ application.status }}</span>
+            {% endif %}
+        </div>
+
+        <div class="actions">
+            <a href="/projects" class="button button-secondary">
+                К проектам
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    У вас пока нет откликов 😔
     <br><br>
-    <a href="/">На главную</a>
-</body>
-</html>
+    <a href="/projects" class="button">
+        Найти проект
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
