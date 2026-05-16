@@ -1,19 +1,75 @@
-<h1>Отклики на проект</h1>
+{% extends "base.html" %}
 
-{% for app in applications %}
-    <div>
-        <p>Пользователь ID: {{ app.user_id }}</p>
-        <p>Статус: {{ app.status }}</p>
+{% block title %}Отклики на проект{% endblock %}
 
-        {% if app.status == "pending" %}
-            <form method="post" action="/applications/{{ app.id }}/accept">
-                <button type="submit">Принять</button>
-            </form>
+{% block content %}
+<h1 class="page-title">Отклики на проект</h1>
 
-            <form method="post" action="/applications/{{ app.id }}/reject">
-                <button type="submit">Отклонить</button>
-            </form>
-        {% endif %}
+<div class="card user-panel">
+    <h2>{{ project.title }}</h2>
+    <p>{{ project.description }}</p>
+</div>
+
+{% if message %}
+    <div class="alert alert-info">
+        {{ message }}
     </div>
-    <hr>
-{% endfor %}
+{% endif %}
+
+{% if applications %}
+<div class="project-grid">
+    {% for application in applications %}
+    <div class="card project-card">
+
+        <div>
+            <h3>Отклик #{{ application.id }}</h3>
+            <p>Пользователь ID: {{ application.user_id }}</p>
+            <p>Проект ID: {{ application.project_id }}</p>
+        </div>
+
+        <div class="meta">
+            {% if application.status == "pending" %}
+                <span class="badge badge-warning">На рассмотрении</span>
+            {% elif application.status == "accepted" %}
+                <span class="badge badge-success">Принят</span>
+            {% elif application.status == "rejected" %}
+                <span class="badge badge-muted">Отклонён</span>
+            {% else %}
+                <span class="badge badge-muted">{{ application.status }}</span>
+            {% endif %}
+        </div>
+
+        <div class="actions">
+            {% if application.status == "pending" %}
+                <form method="post" action="/applications/{{ application.id }}/accept">
+                    <button type="submit" class="button">
+                        Принять
+                    </button>
+                </form>
+
+                <form method="post" action="/applications/{{ application.id }}/reject">
+                    <button type="submit" class="button button-danger">
+                        Отклонить
+                    </button>
+                </form>
+            {% else %}
+                <span class="badge badge-muted">
+                    Решение уже принято
+                </span>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    На этот проект пока никто не откликнулся 😔
+</div>
+{% endif %}
+
+<br>
+<a href="/my-projects" class="button button-secondary">
+    Назад к моим проектам
+</a>
+{% endblock %}

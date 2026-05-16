@@ -41,11 +41,17 @@ class ApplicationService:
 
         project = await self.application_repository.get_project_by_id(application.project_id)
 
+        if not project:
+            raise ValueError("Проект не найден")
+
         if project.owner_id != user_id:
             raise ValueError("Вы не являетесь владельцем проекта")
 
         if application.status != "pending":
             raise ValueError("Статус уже изменен")
+
+        if status not in ["accepted", "rejected"]:
+            raise ValueError("Недопустимый статус")
 
         return await self.application_repository.update_status(application, status)
 

@@ -55,6 +55,10 @@ class ApplicationRepository:
         return application
 
     async def get_project_applications(self, project_id: int) -> list[Application]:
-        stmt = select(Application).where(Application.project_id == project_id)
+        stmt = (
+            select(Application)
+            .where(Application.project_id == project_id)
+            .order_by(Application.id.desc())
+        )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())

@@ -74,6 +74,9 @@ async def project_applications(
     session: AsyncSession = Depends(get_session),
 ):
     user_id = request.session.get("user_id")
+    user_name = request.session.get("user_name")
+    user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
 
     if not user_id:
         return RedirectResponse(url="/login", status_code=303)
@@ -81,14 +84,33 @@ async def project_applications(
     application_repository = ApplicationRepository(session)
     application_service = ApplicationService(application_repository)
 
+    project = await application_repository.get_project_by_id(project_id)
+
+    if not project:
+        return RedirectResponse(
+            url="/my-projects?message=Проект не найден", 
+            status_code=303
+        )
+
+    if project.owner_id != user_id:
+        return RedirectResponse(
+            url="/my-projects?message=У вас нет доступа к откликам на этот проект", 
+            status_code=303
+        )
+
     applications = await application_service.get_project_applications(project_id)
+    message = request.query_params.get("message")
 
     return templates.TemplateResponse(
         request=request,
         name="project_applications.html",
         context={
+            "project": project,
             "applications": applications,
-            "project_id": project_id,
+            "user_name": user_name,
+            "user_email": user_email,
+            "user_role": user_role,
+            "message": message
         }
     )
 
@@ -101,15 +123,36 @@ async def accept_application(
 ):
     user_id = request.session.get("user_id")
 
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
     application_repository = ApplicationRepository(session)
     application_service = ApplicationService(application_repository)
 
-    try:
-        await application_service.change_status(application_id, user_id, "accepted")
-    except ValueError:
-        pass
+    application = await application_repository.get_by_id(application_id)
 
-    return RedirectResponse(url="/my-projects", status_code=303)
+    if not application:
+        return RedirectResponse(url="/my-projects", status_code=303)
+
+    project_id = application.project_id
+
+    try:
+        await application_service.change_status(
+            application_id=application_id, 
+            user_id=user_id, 
+            status="accepted",
+        )
+
+        return RedirectResponse(
+            url=f"/projects/{project_id}/applications?message=Отклик принят", 
+            status_code=303,
+        )
+
+    except ValueError as e:
+        return RedirectResponse(
+            url=f"/projects/{project_id}/applications?message={str(e)}", 
+            status_code=303,
+        )
 
 
 @router.post("/applications/{application_id}/reject")
@@ -120,12 +163,33 @@ async def reject_application(
 ):
     user_id = request.session.get("user_id")
 
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
     application_repository = ApplicationRepository(session)
     application_service = ApplicationService(application_repository)
 
-    try:
-        await application_service.change_status(application_id, user_id, "rejected")
-    except ValueError:
-        pass
+    application = await application_repository.get_by_id(application_id)
 
-    return RedirectResponse(url="/my-projects", status_code=303)
+    if not application:
+        return RedirectResponse(url="/my-projects", status_code=303)
+
+    project_id = application.project_id
+
+    try:
+        await application_service.change_status(
+            application_id=application_id, 
+            user_id=user_id, 
+            status="rejected",
+        )
+
+        return RedirectResponse(
+            url=f"/projects/{project_id}/applications?message=Отклик отклонен", 
+            status_code=303,
+        )
+
+    except ValueError as e:
+        return RedirectResponse(
+            url=f"/projects/{project_id}/applications?message={str(e)}", 
+            status_code=303,
+        )
