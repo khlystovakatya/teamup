@@ -343,6 +343,10 @@ textarea.form-control {
     margin-top: 10px;
 }
 
+.form-actions {
+    margin-top: 32px;
+}
+
 @media (max-width: 760px) {
     .header-inner {
         min-height: auto;

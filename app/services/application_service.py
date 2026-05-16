@@ -22,6 +22,17 @@ class ApplicationService:
         if existing_application:
             raise ValueError("Вы уже откликались на этот проект")
 
+        applications = await self.application_repository.get_project_applications(project_id)
+
+        accepted_count = len([
+            application
+            for application in applications
+            if application.status == "accepted"
+        ])
+
+        if accepted_count >= project.max_participants:
+            raise ValueError("Свободных мест в проекте больше нет")
+
         return await self.application_repository.create_application(
             project_id=project_id, 
             user_id=user_id,
@@ -52,6 +63,18 @@ class ApplicationService:
 
         if status not in ["accepted", "rejected"]:
             raise ValueError("Недопустимый статус")
+
+        if status == "accepted":
+            applications = await self.application_repository.get_project_applications(project.id)
+
+            accepted_count = len([
+                item
+                for item in applications
+                if item.status == "accepted"
+            ])
+
+            if accepted_count >= project.max_participants:
+                raise ValueError("Свободных мест в проекте больше нет")
 
         return await self.application_repository.update_status(application, status)
 

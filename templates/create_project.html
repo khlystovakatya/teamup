@@ -34,9 +34,23 @@
             ></textarea>
         </div>
 
-        <button type="submit" class="button">
-            Создать проект
-        </button>
+        <div class="form-group">
+            <label>Количество участников</label>
+            <input 
+                type="number"
+                name="max_participants"
+                class="form-control"
+                placeholder="Например: 3"
+                min="1"
+                required
+            >
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button">
+                Создать проект
+            </button>
+        </div>
     </form>
 </div>
 {% endblock %}

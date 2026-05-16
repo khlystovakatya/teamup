@@ -40,15 +40,29 @@
                     {% else %}
                         <span class="badge badge-muted">{{ project.status }}</span>
                     {% endif %}
+
+                    <span class="badge badge-muted">
+                        Принято:
+                        {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
+                        из
+                        {{ project.max_participants }}
+                    </span>
                 </div>
 
                 <div class="actions">
+                    {% set accepted_count = project.applications | selectattr("status", "equalto", "accepted") | list | length %}
+
                     {% if user_id == project.owner_id %}
                         <span class="badge">Ваш проект</span>
 
                     {% elif project.id in applied_project_ids %}
                         <span class="badge badge-warning">
                             Вы уже откликнулись
+                        </span>
+
+                    {% elif accepted_count >= project.max_participants %}
+                        <span class="badge badge-muted">
+                            Мест больше нет
                         </span>
 
                     {% else %}

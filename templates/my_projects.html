@@ -21,6 +21,13 @@
                 {% else %}
                     <span class="badge badge-muted">Закрыт</span>
                 {% endif %}
+
+                <span class="badge badge-muted">
+                    Принято:
+                    {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
+                    из
+                    {{ project.max_participants }}
+                </span>
             </div>
 
             <div class="actions">

@@ -83,9 +83,13 @@ async def create_project(
     request: Request,
     title: str = Form(...),
     description: str = Form(...),
+    max_participants: int = Form(...),
     session: AsyncSession = Depends(get_session),
 ):
     user_id = request.session.get("user_id")
+    user_name = request.session.get("user_name")
+    user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
 
     if not user_id:
         return RedirectResponse(url="/login", status_code=303)
@@ -93,17 +97,31 @@ async def create_project(
     project_repository = ProjectRepository(session)
     project_service = ProjectService(project_repository)
 
-    project_data = ProjectCreate(
-        title=title,
-        description=description,
-    )
+    try:
+        project_data = ProjectCreate(
+            title=title,
+            description=description,
+            max_participants=max_participants,
+        )
 
-    await project_service.create_project(project_data, owner_id=user_id)
+        await project_service.create_project(project_data, owner_id=user_id)
 
-    return RedirectResponse(
-        url="/projects?message=Проект успешно создан",
-        status_code=303,
-    )
+        return RedirectResponse(
+            url="/projects?message=Проект успешно создан",
+            status_code=303,
+        )
+    
+    except ValueError as e:
+        return templates.TemplateResponse(
+            request=request,
+            name="create_project.html",
+            context={
+                "error": str(e),
+                "user_name": user_name,
+                "user_email": user_email,
+                "user_role": user_role,
+            },
+        )
 
 
 @router.get("/my-projects")

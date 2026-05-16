@@ -12,12 +12,14 @@ class ProjectRepository:
     async def create_project(
         self, 
         title: str, 
-        description: str, 
+        description: str,
+        max_participants: int,
         owner_id: int
     ) -> Project:
         project = Project(
             title=title, 
-            description=description, 
+            description=description,
+            max_participants=max_participants,
             owner_id=owner_id,
             status="draft"
         )
@@ -31,9 +33,12 @@ class ProjectRepository:
     async def get_all_projects(self) -> list[Project]:
         stmt = (
             select(Project)
-            .options(selectinload(Project.owner))
+            .options(
+                selectinload(Project.owner),
+                selectinload(Project.applications),
+            )
             .order_by(Project.id.desc())
         )
-        
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
