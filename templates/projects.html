@@ -30,12 +30,16 @@
 
                 <div class="meta">
                     <span class="badge badge-muted">
-                        Автор ID: {{ project.owner_id }}
+                        Автор: {{ project.owner.first_name }} {{ project.owner.last_name }}
                     </span>
 
-                    <span class="badge badge-success">
-                        {{ project.status}}
-                    </span>
+                    {% if project.status == "draft" %}
+                        <span class="badge badge-warning">Черновик</span>
+                    {% elif project.status == "open" %}
+                        <span class="badge badge-success">Открыт</span>
+                    {% else %}
+                        <span class="badge badge-muted">{{ project.status }}</span>
+                    {% endif %}
                 </div>
 
                 <div class="actions">

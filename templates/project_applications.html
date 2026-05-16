@@ -22,9 +22,10 @@
     <div class="card project-card">
 
         <div>
-            <h3>Отклик #{{ application.id }}</h3>
-            <p>Пользователь ID: {{ application.user_id }}</p>
-            <p>Проект ID: {{ application.project_id }}</p>
+            <h3>
+                {{ application.user.first_name }} {{ application.user.last_name }}
+            </h3>
+            <p><strong>Email:</strong> {{ application.user.email }}</p>
         </div>
 
         <div class="meta">
