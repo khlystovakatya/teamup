@@ -31,3 +31,42 @@ class ProjectService:
     def get_free_slots(self, project: Project) -> int:
         accepted_count = self.get_accepted_count(project)
         return project.max_participants - accepted_count
+
+    async def open_project(self, project_id: int, user_id: int):
+        project = await self.project_repository.get_by_id(project_id)
+
+        if not project:
+            raise ValueError("Проект не найден")
+
+        if project.owner_id != user_id:
+            raise PermissionError("Вы не являетесь владельцем этого проекта")
+
+        if project.status != "draft":
+            raise ValueError("Открыть можно только проекты в статусе черновика")
+
+        return await self.project_repository.update_status(project, "open")
+
+    async def close_project(self, project_id: int, user_id: int):
+        project = await self.project_repository.get_by_id(project_id)
+
+        if not project:
+            raise ValueError("Проект не найден")
+
+        if project.owner_id != user_id:
+            raise PermissionError("Вы не являетесь владельцем этого проекта")
+
+        if project.status != "open":
+            raise ValueError("Закрыть можно только открытый проект")
+
+        return await self.project_repository.update_status(project, "closed")
+
+    async def delete_project(self, project_id: int, user_id: int):
+        project = await self.project_repository.get_by_id(project_id)
+
+        if not project:
+            raise ValueError("Проект не найден")
+
+        if project.owner_id != user_id:
+            raise PermissionError("Вы не являетесь владельцем проекта")
+
+        await self.project_repository.delete_project(project)

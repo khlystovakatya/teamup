@@ -41,7 +41,7 @@
         </div>
 
         <div class="actions">
-            {% if application.status == "pending" %}
+            {% if application.status == "pending" and project.status == "open" %}
                 <form method="post" action="/applications/{{ application.id }}/accept">
                     <button type="submit" class="button">
                         Принять
@@ -53,6 +53,10 @@
                         Отклонить
                     </button>
                 </form>
+            {% elif application.status == "pending" and project.status != "open" %}
+                <span class="badge badge-muted">
+                    Проект закрыт для обработки откликов
+                </span>
             {% else %}
                 <span class="badge badge-muted">
                     Решение уже принято

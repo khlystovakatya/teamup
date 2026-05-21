@@ -37,6 +37,8 @@
                         <span class="badge badge-warning">Черновик</span>
                     {% elif project.status == "open" %}
                         <span class="badge badge-success">Открыт</span>
+                    {% elif project.status == "closed" %}
+                        <span class="badge badge-muted">Закрыт</span>
                     {% else %}
                         <span class="badge badge-muted">{{ project.status }}</span>
                     {% endif %}
@@ -53,15 +55,37 @@
                     {% set accepted_count = project.applications | selectattr("status", "equalto", "accepted") | list | length %}
 
                     {% if user_id == project.owner_id %}
-                        <span class="badge">Ваш проект</span>
+                        {% if project.status == "draft" %}
+                            <span class="status-label status-warning">
+                                Проект ещё не открыт
+                            </span>
+                        {% elif project.status == "open" %}
+                            <span class="status-label status-success">
+                                Ваш проект открыт
+                            </span>
+                        {% elif project.status == "closed" %}
+                            <span class="status-label status-muted">
+                                Проект закрыт
+                            </span>
+                        {% endif %}
+
+                    {% elif project.status == "draft" %}
+                        <span class="status-label status-warning">
+                            Проект ещё не открыт
+                        </span>
+
+                    {% elif project.status == "closed" %}
+                        <span class="status-label status-muted">
+                            Проект закрыт
+                        </span>
 
                     {% elif project.id in applied_project_ids %}
-                        <span class="badge badge-warning">
+                        <span class="status-label status-warning">
                             Вы уже откликнулись
                         </span>
 
                     {% elif accepted_count >= project.max_participants %}
-                        <span class="badge badge-muted">
+                        <span class="status-label status-muted">
                             Мест больше нет
                         </span>
 

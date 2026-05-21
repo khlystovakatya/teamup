@@ -5,6 +5,12 @@
 {% block content %}
 <h1 class="page-title">Мои проекты</h1>
 
+{% if message %}
+    <div class="alert alert-info">
+        {{ message }}
+    </div>
+{% endif %}
+
 {% if projects %}
     <div class="project-grid">
         {% for project in projects %}
@@ -16,10 +22,14 @@
             </div>
 
             <div class="meta">
-                {% if project.status == "open" %}
+                {% if project.status == "draft" %}
+                    <span class="badge badge-warning">Черновик</span>
+                {% elif project.status == "open" %}
                     <span class="badge badge-success">Открыт</span>
-                {% else %}
+                {% elif project.status == "closed" %}
                     <span class="badge badge-muted">Закрыт</span>
+                {% else %}
+                    <span class="badge badge-muted">{{ project.status }}</span>
                 {% endif %}
 
                 <span class="badge badge-muted">
@@ -31,15 +41,35 @@
             </div>
 
             <div class="actions">
-                <a href="/projects/{{ project.id }}" class="button button-secondary">
-                    Подробнее
-                </a>
+                {% if project.status == "draft" %}
+                    <form method="post" action="/projects/{{ project.id }}/open">
+                        <button type="submit" class="button">
+                            Открыть проект
+                        </button>
+                    </form>
 
-                <a href="/projects/{{ project.id }}/applications" class="button">
+                {% elif project.status == "open" %}
+                    <form method="post" action="/projects/{{ project.id }}/close">
+                        <button type="submit" class="button button-danger">
+                            Закрыть проект
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="/projects/{{ project.id }}/applications" class="button button-secondary">
                     Отклики
                 </a>
-            </div>
 
+                <form
+                    method="post"
+                    action="/projects/{{ project.id }}/delete"
+                    onsubmit="return confirm('Вы точно хотите удалить проект? Все отклики по нему тоже будут удалены.');"
+                >
+                    <button type="submit" class="button button-danger">
+                        Удалить
+                    </button>
+                </form>
+            </div>
 
         </div>
         {% endfor %}

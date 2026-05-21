@@ -143,6 +143,8 @@ async def my_projects(
     projects = await project_service.get_all_projects()
     user_projects = [project for project in projects if project.owner_id == user_id]
 
+    message = request.query_params.get("message")
+
     return templates.TemplateResponse(
         request=request,
         name="my_projects.html",
@@ -151,6 +153,7 @@ async def my_projects(
             "user_name": user_name,
             "user_email": user_email,
             "user_role": user_role,
+            "message": message,
         },
     )
 
@@ -182,3 +185,90 @@ async def admin_projects(
             "user_role": user_role,
         },
     )
+
+
+@router.post("/projects/{project_id}/open")
+async def open_project(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    try:
+        await project_service.open_project(project_id=project_id, user_id=user_id)
+
+        return RedirectResponse(
+            url="/my-projects?message=Проект открыт для откликов",
+            status_code=303,
+        )
+    
+    except ValueError as e:
+        return RedirectResponse(
+            url=f"/my-projects?message={str(e)}",
+            status_code=303,
+        )
+
+
+@router.post("/projects/{project_id}/close")
+async def close_project(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    try:
+        await project_service.close_project(project_id=project_id, user_id=user_id)
+
+        return RedirectResponse(
+            url="/my-projects?message=Проект закрыт",
+            status_code=303,
+        )
+    
+    except ValueError as e:
+        return RedirectResponse(
+            url=f"/my-projects?message={str(e)}",
+            status_code=303,
+        )
+
+
+@router.post("/projects/{project_id}/delete")
+async def delete_project(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    try:
+        await project_service.delete_project(project_id=project_id, user_id=user_id)
+
+        return RedirectResponse(
+            url="/my-projects?message=Проект удален",
+            status_code=303,
+        )
+    
+    except ValueError as e:
+        return RedirectResponse(
+            url=f"/my-projects?message={str(e)}",
+            status_code=303,
+)

@@ -11,6 +11,9 @@ class ApplicationService:
         if project is None:
             raise ValueError("Проект не найден")
 
+        if project.status != "open":
+            raise ValueError("Откликнуться можно только на открытый проект")
+
         if project.owner_id == user_id:
             raise ValueError("Нельзя откликнуться на собственный проект")
 
@@ -57,6 +60,9 @@ class ApplicationService:
 
         if project.owner_id != user_id:
             raise ValueError("Вы не являетесь владельцем проекта")
+
+        if project.status != "open":
+            raise ValueError("Изменять отклики можно только для открытого проекта")
 
         if application.status != "pending":
             raise ValueError("Статус уже изменен")
