@@ -16,15 +16,37 @@
         </div>
 
         <div class="meta">
-            {% if application.status == "pending" %}
-                <span class="badge badge-warning">На рассмотрении</span>
-            {% elif application.status == "accepted" %}
-                <span class="badge badge-success">Принят</span>
-            {% elif application.status == "rejected" %}
-                <span class="badge badge-muted">Отклонен</span>
+            {% if application.project.status == "draft" %}
+                <span class="badge badge-warning">Проект: черновик</span>
+            {% elif application.project.status == "open" %}
+                <span class="badge badge-success">Проект: открыт</span>
+            {% elif application.project.status == "closed" %}
+                <span class="badge badge-muted">Проект: закрыт</span>
             {% else %}
-                <span class="badge badge-muted">{{ application.status }}</span>
+                <span class="badge badge-muted">Проект: {{ application.project.status }}</span>
             {% endif %}
+
+            {% if application.status == "pending" %}
+                <span class="badge badge-warning">Отклик: на рассмотрении</span>
+            {% elif application.status == "accepted" %}
+                <span class="badge badge-success">Отклик: принят</span>
+            {% elif application.status == "rejected" %}
+                <span class="badge badge-muted">Отклик: отклонён</span>
+            {% else %}
+                <span class="badge badge-muted">Отклик: {{ application.status }}</span>
+            {% endif %}
+        </div>
+
+        <div class="application-author-info">
+            <p>
+                <strong>Автор проекта:</strong>
+                {{ application.project.owner.first_name }} {{ application.project.owner.last_name }}
+            </p>
+
+            <p>
+                <strong>Email автора:</strong>
+                {{ application.project.owner.email }}
+            </p>
         </div>
 
         <div class="actions">

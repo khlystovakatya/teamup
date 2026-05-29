@@ -10,12 +10,14 @@ class ApplicationRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_project_and_user(self, project_id: int, user_id: int) -> Application | None:
+    async def get_by_project_and_user(
+        self, project_id: int, user_id: int
+    ) -> Application | None:
         stmt = select(Application).where(
-            Application.project_id == project_id, 
+            Application.project_id == project_id,
             Application.user_id == user_id,
         )
-        
+
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -27,7 +29,7 @@ class ApplicationRepository:
 
     async def create_application(self, project_id: int, user_id: int) -> Application:
         application = Application(
-            project_id=project_id, 
+            project_id=project_id,
             user_id=user_id,
             status="pending",
         )
@@ -41,7 +43,7 @@ class ApplicationRepository:
     async def get_user_applications(self, user_id: int) -> list[Application]:
         stmt = (
             select(Application)
-            .options(selectinload(Application.project))
+            .options(selectinload(Application.project).selectinload(Project.owner))
             .where(Application.user_id == user_id)
             .order_by(Application.id.desc())
         )
@@ -61,10 +63,10 @@ class ApplicationRepository:
             .options(
                 selectinload(Application.project),
                 selectinload(Application.user),
-                )
+            )
             .where(Application.id == application_id)
         )
-        
+
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -83,6 +85,6 @@ class ApplicationRepository:
             .where(Application.project_id == project_id)
             .order_by(Application.id.desc())
         )
-        
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())

@@ -458,6 +458,23 @@ textarea.form-control {
     white-space: nowrap;
 }
 
+.application-author-info {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.application-author-info p {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.application-author-info p + p {
+    margin-top: 6px;
+}
+
 @media (max-width: 760px) {
     .header-inner {
         min-height: auto;
