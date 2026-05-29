@@ -475,6 +475,44 @@ textarea.form-control {
     margin-top: 6px;
 }
 
+.project-summary-card {
+    margin-bottom: 22px;
+}
+
+.project-summary-card h2 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.project-summary-card p {
+    margin: 0 0 16px;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.application-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.application-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.application-card-header h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.application-card-header p {
+    margin: 0;
+    color: #4b5563;
+}
+
 @media (max-width: 760px) {
     .header-inner {
         min-height: auto;
@@ -519,5 +557,9 @@ textarea.form-control {
 
     .project-detail-info {
         grid-template-columns: 1fr;
+    }
+
+    .application-card-header {
+        flex-direction: column;
     }
 }

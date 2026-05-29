@@ -5,9 +5,34 @@
 {% block content %}
 <h1 class="page-title">Отклики на проект</h1>
 
-<div class="card user-panel">
-    <h2>{{ project.title }}</h2>
-    <p>{{ project.description }}</p>
+{% set accepted_count = applications | selectattr("status", "equalto", "accepted") | list | length %}
+{% set free_slots = project.max_participants - accepted_count %}
+
+<div class="card project-summary-card">
+    <div>
+        <h2>{{  project.title }}</h2>
+        <p>{{ project.description }}</p>
+    </div>
+
+    <div class="meta">
+        {% if project.status == "draft" %}
+            <span class="badge badge-warning">Проект: черновик</span>
+        {% elif project.status == "open" %}
+            <span class="badge badge-success">Проект: открыт</span>
+        {% elif project.status == "closed" %}
+            <span class="badge badge-muted">Проект: закрыт</span>
+        {% else %}
+            <span class="badge badge-muted">Проект: {{ project.status }}</span>
+        {% endif %}
+
+        <span class="badge badge-muted">
+            Принято: {{ accepted_count }} из {{ project.max_participants }}
+        </span>
+
+        <span class="badge badge-muted">
+            Свободно мест: {{ free_slots }}
+        </span>
+    </div>
 </div>
 
 {% if message %}
@@ -19,25 +44,30 @@
 {% if applications %}
 <div class="project-grid">
     {% for application in applications %}
-    <div class="card project-card">
+    <div class="card application-card">
 
-        <div>
-            <h3>
-                {{ application.user.first_name }} {{ application.user.last_name }}
-            </h3>
-            <p><strong>Email:</strong> {{ application.user.email }}</p>
-        </div>
+        <div class="application-card-header">
+            <div>
+                <h3>
+                    {{ application.user.first_name }} {{ application.user.last_name }}
+                </h3>
 
-        <div class="meta">
-            {% if application.status == "pending" %}
-                <span class="badge badge-warning">На рассмотрении</span>
-            {% elif application.status == "accepted" %}
-                <span class="badge badge-success">Принят</span>
-            {% elif application.status == "rejected" %}
-                <span class="badge badge-muted">Отклонён</span>
-            {% else %}
-                <span class="badge badge-muted">{{ application.status }}</span>
-            {% endif %}
+                <p>
+                    <strong>Email:</strong> {{ application.user.email }}
+                </p>
+            </div>
+
+            <div>
+                {% if application.status == "pending" %}
+                    <span class="badge badge-warning">На рассмотрении</span>
+                {% elif application.status == "accepted" %}
+                    <span class="badge badge-success">Принят</span>
+                {% elif application.status == "rejected" %}
+                    <span class="badge badge-muted">Отклонён</span>
+                {% else %}
+                    <span class="badge badge-muted">{{ application.status }}</span>
+                {% endif %}
+            </div>
         </div>
 
         <div class="actions">
@@ -53,12 +83,24 @@
                         Отклонить
                     </button>
                 </form>
+
             {% elif application.status == "pending" and project.status != "open" %}
                 <span class="badge badge-muted">
                     Проект закрыт для обработки откликов
                 </span>
+            {% elif application.status == "pending" and free_slots <= 0 %}
+            <span class="status-label status-muted">
+                Свободных мест нет
+            </span>
+
+            <form method="post" action="/applications/{{ application.id }}/reject">
+                <button type="submit" class="button button-danger">
+                    Отклонить
+                </button>
+            </form>
+
             {% else %}
-                <span class="badge badge-muted">
+                <span class="status-label status-muted">
                     Решение уже принято
                 </span>
             {% endif %}
@@ -74,6 +116,7 @@
 {% endif %}
 
 <br>
+
 <a href="/my-projects" class="button button-secondary">
     Назад к моим проектам
 </a>
