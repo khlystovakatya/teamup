@@ -4,109 +4,137 @@
 
 {% block content %}
 
-{% if message %}
-    <div class="alert alert-info">
-        {{ message }}
-    </div>
-{% endif %}
-
 <div class="page-header">
     <h1 class="page-title">Проекты</h1>
 
     {% if user_name %}
-        <a href="/projects/create" class="button">Создать проект</a>
+    <a href="/projects/create" class="button">
+        Создать проект
+    </a>
     {% endif %}
 </div>
 
-{% if projects %}
-    <div class="projects-grid">
-        {% for project in projects %}
-            <div class="card project-card">
-
-                <div>
-                    <h3>{{ project.title }}</h3>
-                    <p>{{ project.description }}</p>
-                </div>
-
-                <div class="meta">
-                    <span class="badge badge-muted">
-                        Автор: {{ project.owner.first_name }} {{ project.owner.last_name }}
-                    </span>
-
-                    {% if project.status == "draft" %}
-                        <span class="badge badge-warning">Черновик</span>
-                    {% elif project.status == "open" %}
-                        <span class="badge badge-success">Открыт</span>
-                    {% elif project.status == "closed" %}
-                        <span class="badge badge-muted">Закрыт</span>
-                    {% else %}
-                        <span class="badge badge-muted">{{ project.status }}</span>
-                    {% endif %}
-
-                    <span class="badge badge-muted">
-                        Принято:
-                        {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
-                        из
-                        {{ project.max_participants }}
-                    </span>
-                </div>
-
-                <div class="actions">
-                    <a href="/projects/{{ project.id }}" class="button button-secondary">
-                        Подробнее
-                    </a>
-                    
-                    {% set accepted_count = project.applications | selectattr("status", "equalto", "accepted") | list | length %}
-
-                    {% if user_id == project.owner_id %}
-                        {% if project.status == "draft" %}
-                            <span class="status-label status-warning">
-                                Проект ещё не открыт
-                            </span>
-                        {% elif project.status == "open" %}
-                            <span class="status-label status-success">
-                                Ваш проект открыт
-                            </span>
-                        {% elif project.status == "closed" %}
-                            <span class="status-label status-muted">
-                                Проект закрыт
-                            </span>
-                        {% endif %}
-
-                    {% elif project.status == "draft" %}
-                        <span class="status-label status-warning">
-                            Проект ещё не открыт
-                        </span>
-
-                    {% elif project.status == "closed" %}
-                        <span class="status-label status-muted">
-                            Проект закрыт
-                        </span>
-
-                    {% elif project.id in applied_project_ids %}
-                        <span class="status-label status-warning">
-                            Вы уже откликнулись
-                        </span>
-
-                    {% elif accepted_count >= project.max_participants %}
-                        <span class="badge badge-muted">
-                            Мест больше нет
-                        </span>
-
-                    {% else %}
-                        <form action="/projects/{{ project.id }}/apply" method="post">
-                            <button class="button" type="submit">
-                                Откликнуться
-                            </button>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="empty">
-        Пока нет проектов.
-    </div>
+{% if message %}
+<div class="alert alert-info">
+    {{ message }}
+</div>
 {% endif %}
+
+<form method="get" action="/projects" class="search-form">
+    <input type="text" name="search" class="form-control search-input"
+        placeholder="Найти проект по названию или описанию" value="{{ search }}">
+
+    <button type="submit" class="button">
+        Искать
+    </button>
+
+    {% if search %}
+    <a href="/projects" class="button button-secondary">
+        Сбросить
+    </a>
+    {% endif %}
+</form>
+
+{% if projects %}
+<div class="projects-grid">
+    {% for project in projects %}
+    <div class="card project-card">
+
+        <div>
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
+        </div>
+
+        <div class="meta">
+            <span class="badge badge-muted">
+                Автор: {{ project.owner.first_name }} {{ project.owner.last_name }}
+            </span>
+
+            {% if project.status == "draft" %}
+            <span class="badge badge-warning">Черновик</span>
+            {% elif project.status == "open" %}
+            <span class="badge badge-success">Открыт</span>
+            {% elif project.status == "closed" %}
+            <span class="badge badge-muted">Закрыт</span>
+            {% else %}
+            <span class="badge badge-muted">{{ project.status }}</span>
+            {% endif %}
+
+            <span class="badge badge-muted">
+                Принято:
+                {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
+                из
+                {{ project.max_participants }}
+            </span>
+        </div>
+
+        <div class="actions">
+            <a href="/projects/{{ project.id }}" class="button button-secondary">
+                Подробнее
+            </a>
+
+            {% set accepted_count = project.applications | selectattr("status", "equalto", "accepted") | list | length
+            %}
+
+            {% if user_id == project.owner_id %}
+            {% if project.status == "draft" %}
+            <span class="badge badge-warning">
+                Проект ещё не открыт
+            </span>
+            {% elif project.status == "open" %}
+            <span class="badge badge-success">
+                Ваш проект открыт
+            </span>
+            {% elif project.status == "closed" %}
+            <span class="badge badge-muted">
+                Проект закрыт
+            </span>
+            {% endif %}
+
+            {% elif project.status == "draft" %}
+            <span class="badge badge-warning">
+                Проект ещё не открыт
+            </span>
+
+            {% elif project.status == "closed" %}
+            <span class="badge badge-muted">
+                Проект закрыт
+            </span>
+
+            {% elif project.id in applied_project_ids %}
+            <span class="badge badge-warning">
+                Вы уже откликнулись
+            </span>
+
+            {% elif accepted_count >= project.max_participants %}
+            <span class="badge badge-muted">
+                Мест больше нет
+            </span>
+
+            {% else %}
+            <form action="/projects/{{ project.id }}/apply" method="post">
+                <button class="button" type="submit">
+                    Откликнуться
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    {% if search %}
+    По запросу «{{ search }}» проекты не найдены.
+    <br><br>
+    <a href="/projects" class="button button-secondary">
+        Сбросить поиск
+    </a>
+    {% else %}
+    Пока нет проектов.
+    {% endif %}
+</div>
+{% endif %}
+
 {% endblock %}

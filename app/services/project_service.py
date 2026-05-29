@@ -18,8 +18,8 @@ class ProjectService:
             owner_id=owner_id,
         )
 
-    async def get_all_projects(self):
-        return await self.project_repository.get_all_projects()
+    async def get_all_projects(self, search: str | None = None):
+        return await self.project_repository.get_all_projects(search=search)
 
     def get_accepted_count(self, project: Project) -> int:
         return len(

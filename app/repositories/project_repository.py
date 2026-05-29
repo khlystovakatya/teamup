@@ -27,7 +27,7 @@ class ProjectRepository:
 
         return project
 
-    async def get_all_projects(self) -> list[Project]:
+    async def get_all_projects(self, search: str | None = None) -> list[Project]:
         stmt = (
             select(Project)
             .options(
@@ -36,6 +36,14 @@ class ProjectRepository:
             )
             .order_by(Project.id.desc())
         )
+
+        if search:
+            search_value = f"%{search}%"
+
+            stmt = stmt.where(
+                Project.title.ilike(search_value)
+                | Project.description.ilike(search_value)
+            )
 
         result = await self.session.execute(stmt)
         return list(result.scalars().all())

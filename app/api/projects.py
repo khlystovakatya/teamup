@@ -17,12 +17,13 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/projects")
 async def projects_list(
     request: Request,
+    search: str | None = None,
     session: AsyncSession = Depends(get_session),
 ):
     project_repository = ProjectRepository(session)
     project_service = ProjectService(project_repository)
 
-    projects = await project_service.get_all_projects()
+    projects = await project_service.get_all_projects(search=search)
 
     user_id = request.session.get("user_id")
     user_name = request.session.get("user_name")
@@ -52,6 +53,7 @@ async def projects_list(
             "user_role": user_role,
             "applied_project_ids": applied_project_ids,
             "message": message,
+            "search": search or "",
         },
     )
 

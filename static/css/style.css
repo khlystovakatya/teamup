@@ -208,7 +208,7 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
 }
 
 .form {
@@ -513,6 +513,19 @@ textarea.form-control {
     color: #4b5563;
 }
 
+.search-form {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.search-input {
+    width: 100%;
+    max-width: none;
+}
+
 @media (max-width: 760px) {
     .header-inner {
         min-height: auto;
@@ -561,5 +574,13 @@ textarea.form-control {
 
     .application-card-header {
         flex-direction: column;
+    }
+
+    .search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .search-input {
+        max-width: 100%;
     }
 }
