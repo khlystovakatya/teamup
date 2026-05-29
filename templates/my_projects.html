@@ -41,6 +41,10 @@
             </div>
 
             <div class="actions">
+                <a href="/projects/{{ project.id }}" class="button button-secondary">
+                    Подробнее
+                </a>
+
                 {% if project.status == "draft" %}
                     <form method="post" action="/projects/{{ project.id }}/open">
                         <button type="submit" class="button">

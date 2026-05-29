@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+{% if message %}
+    <div class="alert alert-info">
+        {{ message }}
+    </div>
+{% endif %}
+
+<div class="card project-detail-card">
+    <div class="project-detail-header">
+        <div>
+            <h1 class="page-title">{{ project.title }}</h1>
+
+            <p class="project-detail-description">
+                {{ project.description }}
+            </p>
+        </div>
+
+        <div class="project-detail-status">
+            {% if project.status == "draft" %}
+                <span class="badge badge-warning">Черновик</span>
+            {% elif project.status == "open" %}
+                <span class="badge badge-success">Открыт</span>
+            {% elif project.status == "closed" %}
+                <span class="badge badge-muted">Закрыт</span>
+            {% else %}
+                <span class="badge badge-muted">{{ project.status }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="project-detail-info">
+        <div class="info-item">
+            <span class="info-label">Автор проекта</span>
+            <span class="info-value">
+                {{ project.owner.first_name }} {{ project.owner.last_name }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Email автора</span>
+            <span class="info-value">
+                {{ project.owner.email }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Участники</span>
+            <span class="info-value">
+                {{ accepted_count }} из {{ project.max_participants }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Свободных мест</span>
+            <span class="info-value">
+                {{ free_slots }}
+            </span>
+        </div>
+    </div>
+
+    <div class="actions project-detail-actions">
+        {% if user_id %}
+            {% if user_id == project.owner_id %}
+                <span class="project-owner-label">
+                    Это ваш проект
+                </span>
+
+                <a href="/my-projects" class="button button-secondary">
+                    Управлять проектом
+                </a>
+
+            {% elif project.status == "draft" %}
+                <span class="status-label status-warning">
+                    Проект ещё не открыт
+                </span>
+
+            {% elif project.status == "closed" %}
+                <span class="status-label status-muted">
+                    Проект закрыт
+                </span>
+
+            {% elif already_applied %}
+                <span class="status-label status-warning">
+                    Вы уже откликнулись
+                </span>
+
+            {% elif free_slots <= 0 %}
+                <span class="status-label status-muted">
+                    Мест больше нет
+                </span>
+
+            {% else %}
+                <form method="post" action="/projects/{{ project.id }}/apply">
+                    <button type="submit" class="button">
+                        Откликнуться
+                    </button>
+                </form>
+            {% endif %}
+        {% else %}
+            <a href="/login" class="button">
+                Войти, чтобы откликнуться
+            </a>
+        {% endif %}
+
+        <a href="/projects" class="button button-secondary">
+            Назад к проектам
+        </a>
+    </div>
+</div>
+{% endblock %}

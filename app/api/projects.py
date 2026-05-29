@@ -122,6 +122,61 @@ async def create_project(
                 "user_role": user_role,
             },
         )
+    
+
+@router.get("/projects/{project_id}")
+async def project_detail(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    project = await project_service.get_project_by_id(project_id)
+
+    if not project:
+        return RedirectResponse(
+            url='/projects?message=Проект не найден',
+            status_code=303,
+        )
+    
+    user_id = request.session.get('user_id')
+    user_name = request.session.get("user_name")
+    user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
+
+    accepted_count = project_service.get_accepted_count(project)
+    free_slots = project_service.get_free_slots(project)
+
+    already_applied = False
+
+    if user_id:
+        application_repository = ApplicationRepository(session)
+        existing_application = await application_repository.get_by_project_and_user(
+            project_id=project.id,
+            user_id=user_id,
+        )
+
+        already_applied = existing_application is not None
+
+    message = request.query_params.get('message')
+
+    return templates.TemplateResponse(
+        request=request,
+        name="project_detail.html",
+        context={
+            "project": project,
+            "user_id": user_id,
+            "user_name": user_name,
+            "user_email": user_email,
+            "user_role": user_role,
+            "accepted_count": accepted_count,
+            "free_slots": free_slots,
+            "already_applied": already_applied,
+            "message": message,
+        },
+    )
 
 
 @router.get("/my-projects")

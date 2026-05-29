@@ -70,3 +70,6 @@ class ProjectService:
             raise PermissionError("Вы не являетесь владельцем проекта")
 
         await self.project_repository.delete_project(project)
+
+    async def get_project_by_id(self, project_id: int):
+        return await self.project_repository.get_by_id(project_id)

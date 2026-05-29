@@ -194,7 +194,7 @@ a {
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
-.card + .card {
+.card+.card {
     margin-top: 18px;
 }
 
@@ -384,6 +384,79 @@ textarea.form-control {
     margin-top: 0;
 }
 
+.project-detail-card {
+    padding: 32px;
+}
+
+.project-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.project-detail-header .page-title {
+    margin-bottom: 14px;
+}
+
+.project-detail-description {
+    margin: 0;
+    max-width: 820px;
+    color: #4b5563;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.project-detail-status {
+    flex-shrink: 0;
+}
+
+.project-detail-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+}
+
+.info-item {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.info-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.project-detail-actions {
+    margin-top: 28px;
+}
+
+.project-owner-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
 
 @media (max-width: 760px) {
     .header-inner {
@@ -421,5 +494,13 @@ textarea.form-control {
     .page-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .project-detail-header {
+        flex-direction: column;
+    }
+
+    .project-detail-info {
+        grid-template-columns: 1fr;
     }
 }
