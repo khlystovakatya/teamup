@@ -6,86 +6,87 @@
 <h1 class="page-title">Мои проекты</h1>
 
 {% if message %}
-    <div class="alert alert-info">
-        {{ message }}
-    </div>
+<div class="alert alert-info">
+    {{ message }}
+</div>
 {% endif %}
 
 {% if projects %}
-    <div class="project-grid">
-        {% for project in projects %}
-        <div class="card project-card">
+<div class="project-grid">
+    {% for project in projects %}
+    <div class="card project-card">
 
-            <div>
-                <h3>{{ project.title }}</h3>
-                <p>{{ project.description }}</p>
-            </div>
-
-            <div class="meta">
-                {% if project.status == "draft" %}
-                    <span class="badge badge-warning">Черновик</span>
-                {% elif project.status == "open" %}
-                    <span class="badge badge-success">Открыт</span>
-                {% elif project.status == "closed" %}
-                    <span class="badge badge-muted">Закрыт</span>
-                {% else %}
-                    <span class="badge badge-muted">{{ project.status }}</span>
-                {% endif %}
-
-                <span class="badge badge-muted">
-                    Принято:
-                    {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
-                    из
-                    {{ project.max_participants }}
-                </span>
-            </div>
-
-            <div class="actions">
-                <a href="/projects/{{ project.id }}" class="button button-secondary">
-                    Подробнее
-                </a>
-
-                {% if project.status == "draft" %}
-                    <form method="post" action="/projects/{{ project.id }}/open">
-                        <button type="submit" class="button">
-                            Открыть проект
-                        </button>
-                    </form>
-
-                {% elif project.status == "open" %}
-                    <form method="post" action="/projects/{{ project.id }}/close">
-                        <button type="submit" class="button button-danger">
-                            Закрыть проект
-                        </button>
-                    </form>
-                {% endif %}
-
-                <a href="/projects/{{ project.id }}/applications" class="button button-secondary">
-                    Отклики
-                </a>
-
-                <form
-                    method="post"
-                    action="/projects/{{ project.id }}/delete"
-                    onsubmit="return confirm('Вы точно хотите удалить проект? Все отклики по нему тоже будут удалены.');"
-                >
-                    <button type="submit" class="button button-danger">
-                        Удалить
-                    </button>
-                </form>
-            </div>
-
+        <div>
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
         </div>
-        {% endfor %}
+
+        <div class="meta">
+            {% if project.status == "draft" %}
+            <span class="badge badge-warning">Черновик</span>
+            {% elif project.status == "open" %}
+            <span class="badge badge-success">Открыт</span>
+            {% elif project.status == "closed" %}
+            <span class="badge badge-muted">Закрыт</span>
+            {% else %}
+            <span class="badge badge-muted">{{ project.status }}</span>
+            {% endif %}
+
+            <span class="badge badge-muted">
+                Принято:
+                {{ project.applications | selectattr("status", "equalto", "accepted") | list | length }}
+                из
+                {{ project.max_participants }}
+            </span>
+        </div>
+
+        <div class="actions">
+            <a href="/projects/{{ project.id }}" class="button button-secondary">
+                Подробнее
+            </a>
+
+            {% if project.status == "draft" %}
+            <a href="/projects/{{ project.id }}/edit" class="button button-secondary">
+                Редактировать
+            </a>
+
+            <form method="post" action="/projects/{{ project.id }}/open">
+                <button type="submit" class="button">
+                    Открыть проект
+                </button>
+            </form>
+
+            {% elif project.status == "open" %}
+            <form method="post" action="/projects/{{ project.id }}/close">
+                <button type="submit" class="button button-danger">
+                    Закрыть проект
+                </button>
+            </form>
+            {% endif %}
+
+            <a href="/projects/{{ project.id }}/applications" class="button button-secondary">
+                Отклики
+            </a>
+
+            <form method="post" action="/projects/{{ project.id }}/delete"
+                onsubmit="return confirm('Вы точно хотите удалить проект? Все отклики по нему тоже будут удалены.');">
+                <button type="submit" class="button button-danger">
+                    Удалить
+                </button>
+            </form>
+        </div>
+
     </div>
+    {% endfor %}
+</div>
 {% else %}
-    <div class="card empty">
-        У вас пока нет проектов 😔
-        <br><br>
-        <a href="/projects/create" class="button">
-            Создать проект
-        </a>
-    </div>
+<div class="card empty">
+    У вас пока нет проектов 😔
+    <br><br>
+    <a href="/projects/create" class="button">
+        Создать проект
+    </a>
+</div>
 {% endif %}
 
 {% endblock %}

@@ -15,18 +15,20 @@ class ProjectService:
             title=project_data.title,
             description=project_data.description,
             max_participants=project_data.max_participants,
-            owner_id=owner_id
+            owner_id=owner_id,
         )
 
     async def get_all_projects(self):
         return await self.project_repository.get_all_projects()
 
     def get_accepted_count(self, project: Project) -> int:
-        return len([
-            application
-            for application in project.applications
-            if application.status == "accepted"
-        ])
+        return len(
+            [
+                application
+                for application in project.applications
+                if application.status == "accepted"
+            ]
+        )
 
     def get_free_slots(self, project: Project) -> int:
         accepted_count = self.get_accepted_count(project)
@@ -73,3 +75,32 @@ class ProjectService:
 
     async def get_project_by_id(self, project_id: int):
         return await self.project_repository.get_by_id(project_id)
+
+    async def update_project(
+        self,
+        project_id: int,
+        user_id: int,
+        title: str,
+        description: str,
+        max_participants: int,
+    ):
+        project = await self.project_repository.get_by_id(project_id)
+
+        if not project:
+            raise ValueError("Проект не найден")
+
+        if project.owner_id != user_id:
+            raise PermissionError("Вы не являетесь владельцем проекта")
+
+        if project.status != "draft":
+            raise ValueError("Редактировать можно только проект в статусе черновика")
+
+        if max_participants <= 0:
+            raise ValueError("Количество участников должно быть больше 0")
+
+        return await self.project_repository.update_project(
+            project=project,
+            title=title,
+            description=description,
+            max_participants=max_participants,
+        )

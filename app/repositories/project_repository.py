@@ -1,9 +1,9 @@
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.project import Project
 from app.models.application import Application
+from app.models.project import Project
 
 
 class ProjectRepository:
@@ -11,18 +11,14 @@ class ProjectRepository:
         self.session = session
 
     async def create_project(
-        self, 
-        title: str, 
-        description: str,
-        max_participants: int,
-        owner_id: int
+        self, title: str, description: str, max_participants: int, owner_id: int
     ) -> Project:
         project = Project(
-            title=title, 
+            title=title,
             description=description,
             max_participants=max_participants,
             owner_id=owner_id,
-            status="draft"
+            status="draft",
         )
 
         self.session.add(project)
@@ -69,6 +65,22 @@ class ProjectRepository:
         await self.session.execute(
             delete(Application).where(Application.project_id == project.id)
         )
-        
+
         await self.session.delete(project)
         await self.session.commit()
+
+    async def update_project(
+        self,
+        project: Project,
+        title: str,
+        description: str,
+        max_participants: int,
+    ) -> Project:
+        project.title = title
+        project.description = description
+        project.max_participants = max_participants
+
+        await self.session.commit()
+        await self.session.refresh(project)
+
+        return project

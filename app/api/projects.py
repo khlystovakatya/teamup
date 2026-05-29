@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Request, Form, Depends
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
-from app.repositories.project_repository import ProjectRepository
 from app.repositories.application_repository import ApplicationRepository
+from app.repositories.project_repository import ProjectRepository
 from app.schemas.project import ProjectCreate
-from app.services.project_service import ProjectService
 from app.services.application_service import ApplicationService
+from app.services.project_service import ProjectService
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -110,7 +110,7 @@ async def create_project(
             url="/projects?message=Проект успешно создан",
             status_code=303,
         )
-    
+
     except ValueError as e:
         return templates.TemplateResponse(
             request=request,
@@ -122,7 +122,7 @@ async def create_project(
                 "user_role": user_role,
             },
         )
-    
+
 
 @router.get("/projects/{project_id}")
 async def project_detail(
@@ -137,11 +137,11 @@ async def project_detail(
 
     if not project:
         return RedirectResponse(
-            url='/projects?message=Проект не найден',
+            url="/projects?message=Проект не найден",
             status_code=303,
         )
-    
-    user_id = request.session.get('user_id')
+
+    user_id = request.session.get("user_id")
     user_name = request.session.get("user_name")
     user_email = request.session.get("user_email")
     user_role = request.session.get("user_role")
@@ -160,7 +160,7 @@ async def project_detail(
 
         already_applied = existing_application is not None
 
-    message = request.query_params.get('message')
+    message = request.query_params.get("message")
 
     return templates.TemplateResponse(
         request=request,
@@ -177,6 +177,100 @@ async def project_detail(
             "message": message,
         },
     )
+
+
+@router.get("/projects/{project_id}/edit")
+async def edit_project_page(
+    project_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+    user_name = request.session.get("user_name")
+    user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    project = await project_service.get_project_by_id(project_id)
+
+    if not project:
+        return RedirectResponse(
+            url="/my-projects?message=Проект не найден",
+            status_code=303,
+        )
+
+    if project.owner_id != user_id:
+        return RedirectResponse(
+            url="/my-projects?message=Вы не являетесь владельцем этого проекта",
+            status_code=303,
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_project.html",
+        context={
+            "project": project,
+            "error": None,
+            "user_name": user_name,
+            "user_email": user_email,
+            "user_role": user_role,
+        },
+    )
+
+
+@router.post("/projects/{project_id}/edit")
+async def edit_project(
+    project_id: int,
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    max_participants: int = Form(...),
+    session: AsyncSession = Depends(get_session),
+):
+    user_id = request.session.get("user_id")
+    user_name = request.session.get("user_name")
+    user_email = request.session.get("user_email")
+    user_role = request.session.get("user_role")
+
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+
+    project_repository = ProjectRepository(session)
+    project_service = ProjectService(project_repository)
+
+    try:
+        project = await project_service.update_project(
+            project_id=project_id,
+            user_id=user_id,
+            title=title,
+            description=description,
+            max_participants=max_participants,
+        )
+
+        return RedirectResponse(
+            url=f"/projects/{project_id}?message=Проект успешно обновлен",
+            status_code=303,
+        )
+
+    except ValueError as e:
+        project = await project_service.get_project_by_id(project_id)
+
+        return templates.TemplateResponse(
+            request=request,
+            name="edit_project.html",
+            context={
+                "project": project,
+                "error": str(e),
+                "user_name": user_name,
+                "user_email": user_email,
+                "user_role": user_role,
+            },
+        )
 
 
 @router.get("/my-projects")
@@ -263,7 +357,7 @@ async def open_project(
             url="/my-projects?message=Проект открыт для откликов",
             status_code=303,
         )
-    
+
     except ValueError as e:
         return RedirectResponse(
             url=f"/my-projects?message={str(e)}",
@@ -292,7 +386,7 @@ async def close_project(
             url="/my-projects?message=Проект закрыт",
             status_code=303,
         )
-    
+
     except ValueError as e:
         return RedirectResponse(
             url=f"/my-projects?message={str(e)}",
@@ -321,9 +415,9 @@ async def delete_project(
             url="/my-projects?message=Проект удален",
             status_code=303,
         )
-    
+
     except ValueError as e:
         return RedirectResponse(
             url=f"/my-projects?message={str(e)}",
             status_code=303,
-)
+        )

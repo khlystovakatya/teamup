@@ -2,14 +2,14 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
+from app.api.applications import router as applications_router
 from app.api.auth import router as auth_router
 from app.api.pages import router as pages_router
 from app.api.projects import router as projects_router
-from app.api.applications import router as applications_router
-from app.db import engine, Base
-from app.models.user import User
-from app.models.project import Project
+from app.db import Base, engine
 from app.models.application import Application
+from app.models.project import Project
+from app.models.user import User
 
 app = FastAPI()
 

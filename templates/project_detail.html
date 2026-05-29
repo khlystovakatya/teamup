@@ -69,6 +69,12 @@
                     Это ваш проект
                 </span>
 
+                {% if project.status == "draft" %}
+                    <a href="/projects/{{ project.id }}/edit" class="button">
+                        Редактировать
+                    </a>
+                {% endif %}
+
                 <a href="/my-projects" class="button button-secondary">
                     Управлять проектом
                 </a>
